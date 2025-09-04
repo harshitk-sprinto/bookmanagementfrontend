@@ -42,7 +42,7 @@ export default async function Authors() {
     query: GET_AUTHORS,
     variables: {
         page: 1,
-        pageSize: 3
+        pageSize: 5
     }
   });
 
@@ -93,7 +93,7 @@ export default async function Authors() {
 
               <div className="flex mt-4">
                 <div className="text-gray-500 font-bold mr-2">Born: </div>
-                <div>{author.born_date?.toDateString()}</div>
+                <div>{author.born_date?.toISOString()}</div>
               </div>
               <div className="flex mt-4">
                 <div className="text-gray-500 font-bold mr-2">Books: </div>

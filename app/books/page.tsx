@@ -42,7 +42,7 @@ export default async function Books() {
     query: GET_BOOKS,
     variables: {
         page: 1,
-        pageSize: 3
+        pageSize: 10
     }
   });
 
