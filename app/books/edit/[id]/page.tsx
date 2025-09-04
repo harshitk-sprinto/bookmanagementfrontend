@@ -13,7 +13,7 @@ export default function EditBook(){
     const idParam = Array.isArray(params?.id) ? params?.id[0] : params?.id;
     const id = idParam ? Number(idParam) : undefined;
     const [title, setTitle] = useState("");
-    const [authorId, setAuthorId] = useState("");
+    const [authorIds, setAuthorIds] = useState<string[]>([]);
     const [publishedDate, setPublishedDate] = useState("");
     const [description, setDescription] = useState("");
     const [authors, setAuthors] = useState<Author[]>([]);
@@ -37,7 +37,7 @@ export default function EditBook(){
                 setTitle(b.title ?? "");
                 try { setPublishedDate(b.published_date ? new Date(b.published_date).toISOString().substring(0,10) : ""); } catch { setPublishedDate(""); }
                 setDescription(b.description ?? "");
-                setAuthorId(b.authors?.[0]?.id ? String(b.authors[0].id) : "");
+                setAuthorIds((b.authors ?? []).map(a => String(a.id)));
             }
         })();
     }, [id]);
@@ -46,7 +46,7 @@ export default function EditBook(){
         e.preventDefault();
         setError(null);
         if (!title.trim() || !id) { setError("Book title is required"); return; }
-        if (!authorId) { setError("Author is required"); return; }
+        if (!authorIds.length) { setError("At least one author is required"); return; }
         try {
             setLoading(true);
             const client = createApolloClient();
@@ -57,7 +57,7 @@ export default function EditBook(){
                     title: title.trim(),
                     description: description.trim() || null,
                     published_date: publishedDate ? new Date(publishedDate).toISOString() : null,
-                    authorIds: [Number(authorId)],
+                    authorIds: authorIds.map((v) => Number(v)),
                 },
             });
             router.push("/books");
@@ -78,9 +78,16 @@ export default function EditBook(){
                         <input className="border-2 border-gray-500 rounded-2xl p-2" type="text" placeholder="Enter book title" value={title} onChange={(e) => setTitle(e.target.value)} />
                     </div>
                     <div className="mt-4 flex flex-col">
-                        <label className="text-gray-500 font-bold mb-2">Author *</label>
-                        <select className="rounded-2xl border-2 border-gray-400 p-2" value={authorId} onChange={(e) => setAuthorId(e.target.value)}>
-                            <option value="">Select an Author</option>
+                        <label className="text-gray-500 font-bold mb-2">Authors *</label>
+                        <select
+                            className="rounded-2xl border-2 border-gray-400 p-2"
+                            multiple
+                            value={authorIds}
+                            onChange={(e) => {
+                                const selected = Array.from(e.target.selectedOptions).map((o) => o.value);
+                                setAuthorIds(selected);
+                            }}
+                        >
                             {authors.map((a) => (
                                 <option key={a.id} value={a.id}>{a.name}</option>
                             ))}
