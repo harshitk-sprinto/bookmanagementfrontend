@@ -8,7 +8,7 @@ Next.js (App Router) frontend for the Book Management app using Apollo Client.
 
 ### 1) Clone and install
 ```bash
-git clone [repo-url](https://github.com/harshitk-sprinto/bookmanagementfrontend.git)
+git clone https://github.com/harshitk-sprinto/bookmanagementfrontend.git
 cd book-management-frontend
 npm install
 ```
