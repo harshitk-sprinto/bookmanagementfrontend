@@ -4,6 +4,8 @@ import Pagination from "@/components/Pagination";
 import { AuthorsQuery, fetchAuthors } from "@/lib/api/authors";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { createApolloClient } from "@/lib/apolloClient";
+import { DELETE_AUTHOR } from "@/app/authors/queries";
 
 
 export default function Authors() {
@@ -32,6 +34,13 @@ export default function Authors() {
   useEffect(() => {
     loadAuthors(page, pageSize);
   }, [page, pageSize, loadAuthors])
+
+  async function handleDeleteAuthor(id: number) {
+    if (!confirm("Are you sure you want to delete this author?")) return;
+    const client = createApolloClient();
+    await client.mutate({ mutation: DELETE_AUTHOR, variables: { id } });
+    await loadAuthors(page, pageSize);
+  }
   return (
     <>
       <div className="mx-4">
@@ -88,7 +97,7 @@ export default function Authors() {
               </div>
               <div className="flex mt-4">
                 <div className="text-gray-500 font-bold mr-2">Books: </div>
-                <div>{author.books.length}</div>
+                <div> {author.books?.map(a => a.title).join(', ') || 'Unknown'}</div>
               </div>
               <div className="mt-4">
               {author.biography}
@@ -97,7 +106,7 @@ export default function Authors() {
                 <button className="p-2 rounded-lg cursor-pointer bg-blue-400 mr-4" onClick={() => router.push(`/authors/edit/${author.id}`)}>
                   Edit
                 </button>
-                <button className="p-2 rounded-lg cursor-pointer bg-red-400">
+                <button className="p-2 rounded-lg cursor-pointer bg-red-400" onClick={() => handleDeleteAuthor(author.id)}>
                   Delete
                 </button>
               </div>

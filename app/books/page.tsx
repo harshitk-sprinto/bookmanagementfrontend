@@ -5,6 +5,8 @@ import { BooksQuery, fetchBooks } from "@/lib/api/books";
 import { Author, fetchAuthors } from "@/lib/api/authors";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { createApolloClient } from "@/lib/apolloClient";
+import { DELETE_BOOK } from "@/app/books/queries";
 
 export default function Books() {
   const router = useRouter();
@@ -36,6 +38,13 @@ export default function Books() {
   useEffect(() => {
     loadBooks(page, pageSize);
   }, [page, pageSize, loadBooks])
+
+  async function handleDeleteBook(id: number) {
+    if (!confirm("Are you sure you want to delete this book?")) return;
+    const client = createApolloClient();
+    await client.mutate({ mutation: DELETE_BOOK, variables: { id } });
+    await loadBooks(page, pageSize);
+  }
 
   useEffect(() => {
     (async () => {
@@ -137,7 +146,7 @@ export default function Books() {
               <button className="p-2 rounded-lg cursor-pointer bg-blue-400 mr-4" onClick={() => router.push(`/books/edit/${book.id}`)}>
                 Edit
               </button>
-              <button className="p-2 rounded-lg cursor-pointer bg-red-400">
+              <button className="p-2 rounded-lg cursor-pointer bg-red-400" onClick={() => handleDeleteBook(book.id)}>
                 Delete
               </button>
             </div>
