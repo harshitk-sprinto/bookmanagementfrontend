@@ -20,8 +20,7 @@ export default function Authors() {
     const selectedYear = birthYearFilter ? new Date(birthYearFilter).getFullYear() : undefined;
     const filter = {
       name: nameFilter || undefined,
-      bornFrom: selectedYear,
-      bornTo: selectedYear,
+      bornYear: selectedYear,
     } as unknown;
     const result = await fetchAuthors({
       page: nextPage,
@@ -66,7 +65,8 @@ export default function Authors() {
                 </label>
                 <input
                   className="rounded-2xl border-2 border-gray-400 p-2"
-                  type="date"
+                  type="number"
+                  placeholder="eg. 1990"
                   value={birthYearFilter}
                   onChange={(e) => setBirthYearFilter(e.target.value)}
                 ></input>

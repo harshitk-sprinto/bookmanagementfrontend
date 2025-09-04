@@ -20,12 +20,23 @@ export default function Books() {
   const [authors, setAuthors] = useState<Author[]>([]);
 
   const loadBooks = useCallback(async (nextPage: number, nextPageSize: number) => {
+    let from = publishedFromDate || undefined;
+    let to = publishedToDate || undefined;
+    if (from && to) {
+      const fromDate = new Date(from);
+      const toDate = new Date(to);
+      if (fromDate > toDate) {
+        const tmp = from;
+        from = to;
+        to = tmp;
+      }
+    }
+
     const filter = {
       title: titleFilter || undefined,
       authorIds: authorFilter.length ? authorFilter.map((v) => Number(v)) : undefined,
-      // Keep API compatibility by sending year numbers derived from selected dates
-      publishedFrom: publishedFromDate ? new Date(publishedFromDate).getFullYear() : undefined,
-      publishedTo: publishedToDate ? new Date(publishedToDate).getFullYear() : undefined,
+      publishedFrom: from,
+      publishedTo: to,
     } as unknown;
     const result = await fetchBooks({
       page: nextPage,
@@ -38,6 +49,10 @@ export default function Books() {
   useEffect(() => {
     loadBooks(page, pageSize);
   }, [page, pageSize, loadBooks])
+
+  useEffect(() => {
+    setPage(1);
+  }, [titleFilter, authorFilter, publishedFromDate, publishedToDate]);
 
   async function handleDeleteBook(id: number) {
     if (!confirm("Are you sure you want to delete this book?")) return;
