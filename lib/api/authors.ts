@@ -30,13 +30,17 @@ export type AuthorConnection = {
   pageInfo: PageInfo;
 };
 
-export type AuthorQuery = {
+export type AuthorsQuery = {
   authors: AuthorConnection;
 };
 
-export async function fetchAuthors(variables: { page?: number; pageSize?: number; filter?: unknown }): Promise<AuthorQuery | undefined> {
+export type AuthorQuery = {
+  author: Author;
+};
+
+export async function fetchAuthors(variables: { page?: number; pageSize?: number; filter?: unknown }): Promise<AuthorsQuery | undefined> {
   const client = createApolloClient();
-  const { data } = await client.query<AuthorQuery>({
+  const { data } = await client.query<AuthorsQuery>({
     query: GET_AUTHORS,
     variables,
   });

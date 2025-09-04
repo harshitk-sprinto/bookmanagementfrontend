@@ -1,12 +1,14 @@
 'use client'
 import Card from "@/components/Card";
 import Pagination from "@/components/Pagination";
-import { AuthorQuery, fetchAuthors } from "@/lib/api/authors";
+import { AuthorsQuery, fetchAuthors } from "@/lib/api/authors";
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 
 export default function Authors() {
-  const [data, setData] = useState<AuthorQuery | undefined>(undefined);
+  const router = useRouter();
+  const [data, setData] = useState<AuthorsQuery | undefined>(undefined);
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(5);
   const [nameFilter, setNameFilter] = useState<string>("");
@@ -92,7 +94,7 @@ export default function Authors() {
               {author.biography}
               </div>
               <div className="mt-4 flex">
-                <button className="p-2 rounded-lg cursor-pointer bg-blue-400 mr-4">
+                <button className="p-2 rounded-lg cursor-pointer bg-blue-400 mr-4" onClick={() => router.push(`/authors/edit/${author.id}`)}>
                   Edit
                 </button>
                 <button className="p-2 rounded-lg cursor-pointer bg-red-400">

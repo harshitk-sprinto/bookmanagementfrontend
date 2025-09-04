@@ -1,12 +1,14 @@
 'use client'
 import Card from "@/components/Card";
 import Pagination from "@/components/Pagination";
-import { BookQuery, fetchBooks } from "@/lib/api/books";
+import { BooksQuery, fetchBooks } from "@/lib/api/books";
 import { Author, fetchAuthors } from "@/lib/api/authors";
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Books() {
-  const [data, setData] = useState<BookQuery | undefined>(undefined);
+  const router = useRouter();
+  const [data, setData] = useState<BooksQuery | undefined>(undefined);
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(5);
   const [titleFilter, setTitleFilter] = useState<string>("");
@@ -132,7 +134,7 @@ export default function Books() {
               {book.description}
             </div>
             <div className="mt-4 flex">
-              <button className="p-2 rounded-lg cursor-pointer bg-blue-400 mr-4">
+              <button className="p-2 rounded-lg cursor-pointer bg-blue-400 mr-4" onClick={() => router.push(`/books/edit/${book.id}`)}>
                 Edit
               </button>
               <button className="p-2 rounded-lg cursor-pointer bg-red-400">

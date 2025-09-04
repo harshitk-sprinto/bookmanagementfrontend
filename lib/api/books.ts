@@ -30,13 +30,17 @@ export type BookConnection = {
   pageInfo: PageInfo;
 };
 
-export type BookQuery = {
+export type BooksQuery = {
   books: BookConnection;
 };
 
-export async function fetchBooks(variables: { page?: number; pageSize?: number; filter?: unknown }): Promise<BookQuery | undefined> {
+export type BookQuery = {
+  book: Book;
+};
+
+export async function fetchBooks(variables: { page?: number; pageSize?: number; filter?: unknown }): Promise<BooksQuery | undefined> {
   const client = createApolloClient();
-  const { data } = await client.query<BookQuery>({
+  const { data } = await client.query<BooksQuery>({
     query: GET_BOOKS,
     variables,
   });
