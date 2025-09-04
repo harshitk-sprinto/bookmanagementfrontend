@@ -1,50 +1,22 @@
+'use client'
 import Card from "@/components/Card";
-import { createApolloClient } from "@/lib/apolloClient";
-import { GET_BOOKS } from "./queries";
+import { BookQuery, fetchBooks } from "@/lib/api/books";
+import { useEffect, useState } from "react";
 
-type PageInfo = {
-    page: number
-    pageSize: number
-    totalPages: number
-    totalCount: number
-    hasNextPage: boolean
-    hasPrevPage: boolean
-  }
-
-type Book = {
-    id: number
-    title: string
-    description: string
-    published_date: Date
-    authors: [Author]
-  }
-
-  type Author = {
-    id: number,
-    name: string,
-    biography: string,
-    born_date: Date,
-    books: [Book]
-  }
-
-type BookConnection = {
-    nodes: Array<Book>,
-    pageInfo: PageInfo
-  }
-
-type BookQuery = {
-    books: BookConnection
-}
-
-export default async function Books() {
-  const client = createApolloClient();
-  const { data } = await client.query<BookQuery>({
-    query: GET_BOOKS,
-    variables: {
+export default function Books() {
+  const [data, setData] = useState<BookQuery | undefined>(undefined);
+  useEffect(() => {
+    async function loadBooks() {
+      const result = await fetchBooks({
         page: 1,
-        pageSize: 10
+        pageSize: 2,
+      });
+      setData(result);
+      console.log(result);
     }
-  });
+
+    loadBooks();
+  }, [])
 
   return (
     <>

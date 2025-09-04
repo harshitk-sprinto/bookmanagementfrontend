@@ -1,52 +1,23 @@
+'use client'
 import Card from "@/components/Card";
-import { createApolloClient } from "@/lib/apolloClient";
-import { GET_AUTHORS } from "./queries";
+import { AuthorQuery, fetchAuthors } from "@/lib/api/authors";
+import { useEffect, useState } from "react";
 
-type PageInfo = {
-  page: number;
-  pageSize: number;
-  totalPages: number;
-  totalCount: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
-};
 
-type Book = {
-  id: number;
-  title: string;
-  description: string;
-  published_date: Date;
-  authors: [Author];
-};
-
-type Author = {
-  id: number;
-  name: string;
-  biography: string;
-  born_date: Date;
-  books: [Book];
-};
-
-type AuthorConnection = {
-  nodes: Array<Author>;
-  pageInfo: PageInfo;
-};
-
-type AuthorQuery = {
-  authors: AuthorConnection;
-};
-
-export default async function Authors() {
-  const client = createApolloClient();
-  const { data } = await client.query<AuthorQuery>({
-    query: GET_AUTHORS,
-    variables: {
+export default function Authors() {
+  const [data, setData] = useState<AuthorQuery | undefined>(undefined);
+  useEffect(() => {
+    async function loadAuthors() {
+      const result = await fetchAuthors({
         page: 1,
-        pageSize: 5
+        pageSize: 2,
+      });
+      setData(result);
+      console.log(result);
     }
-  });
 
-  console.log(data?.authors.nodes);
+    loadAuthors();
+  }, [])
   return (
     <>
       <div className="mx-4">
