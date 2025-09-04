@@ -154,6 +154,10 @@ export default function Books() {
               <div className="text-gray-500 font-bold mr-2">Published: </div>
               <div>{(() => { try { return new Date(book.published_date).getFullYear(); } catch { return '—'; } })()}</div>
             </div>
+            <div className="flex mt-4">
+              <div className="text-gray-500 font-bold mr-2">Rating: </div>
+              <div>{book.metadata?.averageRating ?? '—'}</div>
+            </div>
             <div className="mt-4">
               {book.description}
             </div>

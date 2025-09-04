@@ -11,6 +11,9 @@ export const GET_BOOKS = gql`
         authors {
           name
         }
+        metadata {
+          averageRating
+        }
       }
       pageInfo {
         page

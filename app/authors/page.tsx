@@ -99,6 +99,10 @@ export default function Authors() {
                 <div className="text-gray-500 font-bold mr-2">Books: </div>
                 <div> {author.books?.map(a => a.title).join(', ') || 'Unknown'}</div>
               </div>
+              <div className="flex mt-4">
+                <div className="text-gray-500 font-bold mr-2">Rating: </div>
+                <div>{author.metadata?.averageRating ?? '—'}</div>
+              </div>
               <div className="mt-4">
               {author.biography}
               </div>

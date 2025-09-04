@@ -23,6 +23,9 @@ export type Book = {
   description: string;
   published_date: Date;
   authors: Author[];
+  metadata?: {
+    averageRating?: number;
+  };
 };
 
 export type BookConnection = {
