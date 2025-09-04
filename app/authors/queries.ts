@@ -23,3 +23,43 @@ export const GET_AUTHORS = gql`
     }
   }
 `;
+
+export const GET_AUTHOR = gql`
+  query GetAuthor($id: ID) {
+    author(id: $id) {
+      id
+      name
+      biography
+      born_date
+      books { id title }
+    }
+  }
+`;
+
+export const CREATE_AUTHOR = gql`
+  mutation CreateAuthor($name: String!, $biography: String, $born_date: Date) {
+    createAuthor(name: $name, biography: $biography, born_date: $born_date) {
+      id
+      name
+      biography
+      born_date
+    }
+  }
+`;
+
+export const UPDATE_AUTHOR = gql`
+  mutation UpdateAuthor($id: ID!, $name: String, $biography: String, $born_date: Date) {
+    updateAuthor(id: $id, name: $name, biography: $biography, born_date: $born_date) {
+      id
+      name
+      biography
+      born_date
+    }
+  }
+`;
+
+export const DELETE_AUTHOR = gql`
+  mutation DeleteAuthor($id: ID!) {
+    deleteAuthor(id: $id)
+  }
+`;

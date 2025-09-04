@@ -9,14 +9,23 @@ export default function Authors() {
   const [data, setData] = useState<AuthorQuery | undefined>(undefined);
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(5);
+  const [nameFilter, setNameFilter] = useState<string>("");
+  const [birthYearFilter, setBirthYearFilter] = useState<string>("");
 
   const loadAuthors = useCallback(async (nextPage: number, nextPageSize: number) => {
+    const selectedYear = birthYearFilter ? new Date(birthYearFilter).getFullYear() : undefined;
+    const filter = {
+      name: nameFilter || undefined,
+      bornFrom: selectedYear,
+      bornTo: selectedYear,
+    } as unknown;
     const result = await fetchAuthors({
       page: nextPage,
       pageSize: nextPageSize,
+      filter,
     });
     setData(result);
-  }, []);
+  }, [nameFilter, birthYearFilter]);
 
   useEffect(() => {
     loadAuthors(page, pageSize);
@@ -36,6 +45,8 @@ export default function Authors() {
                   className="rounded-2xl border-2 border-gray-400 p-2"
                   type="text"
                   placeholder="Enter author name..."
+                  value={nameFilter}
+                  onChange={(e) => setNameFilter(e.target.value)}
                 ></input>
               </div>
               <div className="flex flex-col p-2">
@@ -44,17 +55,21 @@ export default function Authors() {
                 </label>
                 <input
                   className="rounded-2xl border-2 border-gray-400 p-2"
-                  type="number"
-                  placeholder="Year"
+                  type="date"
+                  value={birthYearFilter}
+                  onChange={(e) => setBirthYearFilter(e.target.value)}
                 ></input>
               </div>
-              <div className="flex flex-col p-2">
+              {/* <div className="flex flex-col p-2">
                 <label className="font-bold text-gray-500"></label>
-                <button className="p-2 rounded-2xl bg-blue-500 uppercase cursor-pointer active:border-2">
+                <button
+                  className="p-2 rounded-2xl bg-blue-500 uppercase cursor-pointer active:border-2"
+                  onClick={() => { setPage(1); loadAuthors(1, pageSize); }}
+                >
                   {" "}
                   Apply Filters
                 </button>
-              </div>
+              </div> */}
             </div>
           </div>
         </Card>
@@ -67,7 +82,7 @@ export default function Authors() {
 
               <div className="flex mt-4">
                 <div className="text-gray-500 font-bold mr-2">Born: </div>
-                <div>{author.born_date?.toISOString()}</div>
+                <div>{(() => { try { return author.born_date ? new Date(author.born_date).getFullYear() : "—"; } catch { return "—"; } })()}</div>
               </div>
               <div className="flex mt-4">
                 <div className="text-gray-500 font-bold mr-2">Books: </div>

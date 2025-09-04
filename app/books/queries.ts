@@ -23,3 +23,46 @@ export const GET_BOOKS = gql`
     }
   }
 `;
+
+
+export const GET_BOOK = gql`
+  query GetBook($id: ID) {
+    book(id: $id) {
+      id
+      title
+      description
+      published_date
+      authors { id name }
+    }
+  }
+`;
+
+export const CREATE_BOOK = gql`
+  mutation CreateBook($title: String!, $description: String, $published_date: Date, $authorIds: [Int!]) {
+    createBook(title: $title, description: $description, published_date: $published_date, authorIds: $authorIds) {
+      id
+      title
+      description
+      published_date
+      authors { id name }
+    }
+  }
+`;
+
+export const UPDATE_BOOK = gql`
+  mutation UpdateBook($id: ID!, $title: String, $description: String, $published_date: Date, $authorIds: [Int!]) {
+    updateBook(id: $id, title: $title, description: $description, published_date: $published_date, authorIds: $authorIds) {
+      id
+      title
+      description
+      published_date
+      authors { id name }
+    }
+  }
+`;
+
+export const DELETE_BOOK = gql`
+  mutation DeleteBook($id: ID!) {
+    deleteBook(id: $id)
+  }
+`;

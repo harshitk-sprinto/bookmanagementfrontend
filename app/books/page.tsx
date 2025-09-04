@@ -2,24 +2,45 @@
 import Card from "@/components/Card";
 import Pagination from "@/components/Pagination";
 import { BookQuery, fetchBooks } from "@/lib/api/books";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Author, fetchAuthors } from "@/lib/api/authors";
+import { useCallback, useEffect, useState } from "react";
 
 export default function Books() {
   const [data, setData] = useState<BookQuery | undefined>(undefined);
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(5);
+  const [titleFilter, setTitleFilter] = useState<string>("");
+  const [authorFilter, setAuthorFilter] = useState<string[]>([]);
+  const [publishedFromDate, setPublishedFromDate] = useState<string>("");
+  const [publishedToDate, setPublishedToDate] = useState<string>("");
+  const [authors, setAuthors] = useState<Author[]>([]);
 
   const loadBooks = useCallback(async (nextPage: number, nextPageSize: number) => {
+    const filter = {
+      title: titleFilter || undefined,
+      authorIds: authorFilter.length ? authorFilter.map((v) => Number(v)) : undefined,
+      // Keep API compatibility by sending year numbers derived from selected dates
+      publishedFrom: publishedFromDate ? new Date(publishedFromDate).getFullYear() : undefined,
+      publishedTo: publishedToDate ? new Date(publishedToDate).getFullYear() : undefined,
+    } as unknown;
     const result = await fetchBooks({
       page: nextPage,
       pageSize: nextPageSize,
+      filter,
     });
     setData(result);
-  }, []);
+  }, [titleFilter, authorFilter, publishedFromDate, publishedToDate]);
 
   useEffect(() => {
     loadBooks(page, pageSize);
   }, [page, pageSize, loadBooks])
+
+  useEffect(() => {
+    (async () => {
+      const result = await fetchAuthors({ page: 1, pageSize: 1000 });
+      setAuthors(result?.authors.nodes ?? []);
+    })();
+  }, []);
 
   return (
     <>
@@ -36,33 +57,60 @@ export default function Books() {
                   className="rounded-2xl border-2 border-gray-400 p-2"
                   type="text"
                   placeholder="Enter book title..."
+                  value={titleFilter}
+                  onChange={(e) => setTitleFilter(e.target.value)}
                 ></input>
               </div>
               <div className="flex flex-col p-2">
                 <label className="font-bold text-gray-500 mb-2">
                   Filter by Author
                 </label>
-                <select className="rounded-2xl border-2 border-gray-400 p-2">
-                  <option value="">All Authors</option>
+                <select
+                  className="rounded-2xl border-2 border-gray-400 p-2"
+                  multiple
+                  value={authorFilter}
+                  onChange={(e) => {
+                    const selected = Array.from(e.target.selectedOptions).map((o) => o.value);
+                    setAuthorFilter(selected);
+                  }}
+                >
+                  {authors.map((a) => (
+                    <option key={a.id} value={a.id}>{a.name}</option>
+                  ))}
                 </select>
               </div>
               <div className="flex flex-col p-2">
                 <label className="font-bold text-gray-500 mb-2">
-                  Publication Year
+                  Published From
                 </label>
                 <input
                   className="rounded-2xl border-2 border-gray-400 p-2"
-                  type="text"
-                  placeholder="Year"
+                  type="date"
+                  value={publishedFromDate}
+                  onChange={(e) => setPublishedFromDate(e.target.value)}
                 ></input>
               </div>
               <div className="flex flex-col p-2">
+                <label className="font-bold text-gray-500 mb-2">
+                  Published To
+                </label>
+                <input
+                  className="rounded-2xl border-2 border-gray-400 p-2"
+                  type="date"
+                  value={publishedToDate}
+                  onChange={(e) => setPublishedToDate(e.target.value)}
+                ></input>
+              </div>
+              {/* <div className="flex flex-col p-2">
                 <label className="font-bold text-gray-500 mb-2 h-6"></label>
-                <button className="p-2 rounded-2xl bg-blue-500 uppercase cursor-pointer active:border-2">
+                <button
+                  className="p-2 rounded-2xl bg-blue-500 uppercase cursor-pointer active:border-2"
+                  onClick={() => { setPage(1); loadBooks(1, pageSize); }}
+                >
                   {" "}
                   Apply Filters
                 </button>
-              </div>
+              </div> */}
             </div>
           </div>
         </Card>
@@ -74,11 +122,11 @@ export default function Books() {
 
             <div className="flex mt-4">
               <div className="text-gray-500 font-bold mr-2">Author: </div>
-              <div>George Orwell</div>
+              <div>{book.authors?.map(a => a.name).join(', ') || 'Unknown'}</div>
             </div>
             <div className="flex mt-4">
               <div className="text-gray-500 font-bold mr-2">Published: </div>
-              <div>1945</div>
+              <div>{(() => { try { return new Date(book.published_date).getFullYear(); } catch { return '—'; } })()}</div>
             </div>
             <div className="mt-4">
               {book.description}
