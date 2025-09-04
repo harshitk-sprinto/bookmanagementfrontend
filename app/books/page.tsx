@@ -1,22 +1,25 @@
 'use client'
 import Card from "@/components/Card";
+import Pagination from "@/components/Pagination";
 import { BookQuery, fetchBooks } from "@/lib/api/books";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export default function Books() {
   const [data, setData] = useState<BookQuery | undefined>(undefined);
-  useEffect(() => {
-    async function loadBooks() {
-      const result = await fetchBooks({
-        page: 1,
-        pageSize: 2,
-      });
-      setData(result);
-      console.log(result);
-    }
+  const [page, setPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(5);
 
-    loadBooks();
-  }, [])
+  const loadBooks = useCallback(async (nextPage: number, nextPageSize: number) => {
+    const result = await fetchBooks({
+      page: nextPage,
+      pageSize: nextPageSize,
+    });
+    setData(result);
+  }, []);
+
+  useEffect(() => {
+    loadBooks(page, pageSize);
+  }, [page, pageSize, loadBooks])
 
   return (
     <>
@@ -90,7 +93,18 @@ export default function Books() {
             </div>
           </div>
         </Card>))}
-        
+        {data ? (
+          <Pagination
+            page={data.books.pageInfo.page}
+            pageSize={data.books.pageInfo.pageSize}
+            totalCount={data.books.pageInfo.totalCount}
+            totalPages={data.books.pageInfo.totalPages}
+            hasPrevPage={data.books.pageInfo.hasPrevPage}
+            hasNextPage={data.books.pageInfo.hasNextPage}
+            onPageChange={(p) => setPage(p)}
+            onPageSizeChange={(ps) => { setPage(1); setPageSize(ps); }}
+          />
+        ) : null}
       </div>
     </>
   );

@@ -1,23 +1,26 @@
 'use client'
 import Card from "@/components/Card";
+import Pagination from "@/components/Pagination";
 import { AuthorQuery, fetchAuthors } from "@/lib/api/authors";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 
 export default function Authors() {
   const [data, setData] = useState<AuthorQuery | undefined>(undefined);
-  useEffect(() => {
-    async function loadAuthors() {
-      const result = await fetchAuthors({
-        page: 1,
-        pageSize: 2,
-      });
-      setData(result);
-      console.log(result);
-    }
+  const [page, setPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(5);
 
-    loadAuthors();
-  }, [])
+  const loadAuthors = useCallback(async (nextPage: number, nextPageSize: number) => {
+    const result = await fetchAuthors({
+      page: nextPage,
+      pageSize: nextPageSize,
+    });
+    setData(result);
+  }, []);
+
+  useEffect(() => {
+    loadAuthors(page, pageSize);
+  }, [page, pageSize, loadAuthors])
   return (
     <>
       <div className="mx-4">
@@ -84,6 +87,18 @@ export default function Authors() {
             </div>
           </Card>
         ))}
+        {data ? (
+          <Pagination
+            page={data.authors.pageInfo.page}
+            pageSize={data.authors.pageInfo.pageSize}
+            totalCount={data.authors.pageInfo.totalCount}
+            totalPages={data.authors.pageInfo.totalPages}
+            hasPrevPage={data.authors.pageInfo.hasPrevPage}
+            hasNextPage={data.authors.pageInfo.hasNextPage}
+            onPageChange={(p) => setPage(p)}
+            onPageSizeChange={(ps) => { setPage(1); setPageSize(ps); }}
+          />
+        ) : null}
       </div>
     </>
   );
